@@ -21,7 +21,6 @@ function SignUp() {
   
   return (
     <div className="auth-wrapper">
-      {/* Left Side - Welcome Back */}
       <div className="auth-left">
         <div className="geometric-shapes">
           <div className="shape shape-1"></div>
