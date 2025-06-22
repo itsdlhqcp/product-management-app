@@ -1,7 +1,221 @@
+// import React, { useState, useEffect } from 'react';
+// import AddCategoryModal from './modals/AddCategoryModal';
+// import AddSubCategoryModal from './modals/AddSubCategoryModal';
+// import AddProductModal from './modals/AddProductModal';
+// import '../assets/styles/components/FilterButton.css';
+
+// const FilterButtons = ({ activeFilter, onFilterChange }) => {
+//   const [modals, setModals] = useState({
+//     category: false,
+//     subCategory: false,
+//     product: false
+//   });
+  
+//   const [data, setData] = useState({
+//     categories: [],
+//     subCategories: [],
+//     products: []
+//   });
+
+//   const filters = [
+//     { key: 'categories', label: 'Add categories', icon: '📁' },
+//     { key: 'subcategories', label: 'Add sub categories', icon: '📂' },
+//     { key: 'products', label: 'Add products', icon: '📦' }
+//   ];
+
+//   // Fetch data on component mount
+//   useEffect(() => {
+//     fetchCategories();
+//     fetchSubCategories();
+//     fetchProducts();
+//   }, []);
+
+//   const fetchCategories = async () => {
+//     try {
+//       const response = await fetch('/api/categories');
+//       const result = await response.json();
+//       if (response.ok) {
+//         setData(prev => ({ ...prev, categories: result.categories }));
+//       }
+//     } catch (error) {
+//       console.error('Error fetching categories:', error);
+//     }
+//   };
+
+//   const fetchSubCategories = async () => {
+//     try {
+//       const response = await fetch('/api/subcategories');
+//       const result = await response.json();
+//       if (response.ok) {
+//         setData(prev => ({ ...prev, subCategories: result.subCategories }));
+//       }
+//     } catch (error) {
+//       console.error('Error fetching sub-categories:', error);
+//     }
+//   };
+
+//   const fetchProducts = async () => {
+//     try {
+//       const response = await fetch('/api/products');
+//       const result = await response.json();
+//       if (response.ok) {
+//         setData(prev => ({ ...prev, products: result.products }));
+//       }
+//     } catch (error) {
+//       console.error('Error fetching products:', error);
+//     }
+//   };
+
+//   const openModal = (modalType) => {
+//     setModals(prev => ({ ...prev, [modalType]: true }));
+//   };
+
+//   const closeModal = (modalType) => {
+//     setModals(prev => ({ ...prev, [modalType]: false }));
+//   };
+
+//   const handleFilterClick = (filterKey) => {
+//     onFilterChange(filterKey);
+    
+//     // Open appropriate modal based on filter
+//     switch (filterKey) {
+//       case 'categories':
+//         openModal('category');
+//         break;
+//       case 'subcategories':
+//         openModal('subCategory');
+//         break;
+//       case 'products':
+//         openModal('product');
+//         break;
+//       default:
+//         break;
+//     }
+//   };
+
+//   const handleAddCategory = async (name) => {
+//     try {
+//       const response = await fetch('/api/category', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ name }),
+//       });
+
+//       const result = await response.json();
+      
+//       if (response.ok) {
+//         setData(prev => ({
+//           ...prev,
+//           categories: [result.category, ...prev.categories]
+//         }));
+//         alert('Category added successfully!');
+//       } else {
+//         alert(result.msg || 'Error adding category');
+//       }
+//     } catch (error) {
+//       console.error('Error adding category:', error);
+//       alert('Error adding category');
+//     }
+//   };
+
+//   const handleAddSubCategory = async (name, categoryId) => {
+//     try {
+//       const response = await fetch('/api/subcategory', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ name, categoryId }),
+//       });
+
+//       const result = await response.json();
+      
+//       if (response.ok) {
+//         // Refresh sub-categories to get populated data
+//         await fetchSubCategories();
+//         alert('Sub-category added successfully!');
+//       } else {
+//         alert(result.msg || 'Error adding sub-category');
+//       }
+//     } catch (error) {
+//       console.error('Error adding sub-category:', error);
+//       alert('Error adding sub-category');
+//     }
+//   };
+
+//   const handleAddProduct = async (productData) => {
+//     try {
+//       const response = await fetch('/api/product', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(productData),
+//       });
+
+//       const result = await response.json();
+      
+//       if (response.ok) {
+//         // Refresh products to get populated data
+//         await fetchProducts();
+//         alert('Product added successfully!');
+//       } else {
+//         alert(result.msg || 'Error adding product');
+//       }
+//     } catch (error) {
+//       console.error('Error adding product:', error);
+//       alert('Error adding product');
+//     }
+//   };
+
+//   return (
+//     <>
+//       <div className="filter-buttons">
+//         {filters.map((filter) => (
+//           <button
+//             key={filter.key}
+//             className={`filter-btn ${activeFilter === filter.key ? 'active' : ''}`}
+//             onClick={() => handleFilterClick(filter.key)}
+//           >
+//             <span className="filter-icon">{filter.icon}</span>
+//             {filter.label}
+//           </button>
+//         ))}
+//       </div>
+
+//       {/* Modals */}
+//       <AddCategoryModal
+//         isOpen={modals.category}
+//         onClose={() => closeModal('category')}
+//         onAdd={handleAddCategory}
+//       />
+
+//       <AddSubCategoryModal
+//         isOpen={modals.subCategory}
+//         onClose={() => closeModal('subCategory')}
+//         onAdd={handleAddSubCategory}
+//         categories={data.categories}
+//       />
+
+//       <AddProductModal
+//         isOpen={modals.product}
+//         onClose={() => closeModal('product')}
+//         onAdd={handleAddProduct}
+//         subCategories={data.subCategories}
+//       />
+//     </>
+//   );
+// };
+
+// export default FilterButtons;
+
 import React, { useState, useEffect } from 'react';
 import AddCategoryModal from './modals/AddCategoryModal';
 import AddSubCategoryModal from './modals/AddSubCategoryModal';
 import AddProductModal from './modals/AddProductModal';
+import apiService from '../services/api'; // Import your API service
 import '../assets/styles/components/FilterButton.css';
 
 const FilterButtons = ({ activeFilter, onFilterChange }) => {
@@ -32,11 +246,8 @@ const FilterButtons = ({ activeFilter, onFilterChange }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
-      const result = await response.json();
-      if (response.ok) {
-        setData(prev => ({ ...prev, categories: result.categories }));
-      }
+      const result = await apiService.getCategories();
+      setData(prev => ({ ...prev, categories: result.categories }));
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -44,11 +255,8 @@ const FilterButtons = ({ activeFilter, onFilterChange }) => {
 
   const fetchSubCategories = async () => {
     try {
-      const response = await fetch('/api/subcategories');
-      const result = await response.json();
-      if (response.ok) {
-        setData(prev => ({ ...prev, subCategories: result.subCategories }));
-      }
+      const result = await apiService.getSubCategories();
+      setData(prev => ({ ...prev, subCategories: result.subCategories }));
     } catch (error) {
       console.error('Error fetching sub-categories:', error);
     }
@@ -56,13 +264,12 @@ const FilterButtons = ({ activeFilter, onFilterChange }) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products');
-      const result = await response.json();
-      if (response.ok) {
-        setData(prev => ({ ...prev, products: result.products }));
-      }
+      const result = await apiService.getProducts();
+      setData(prev => ({ ...prev, products: result.products || [] }));
     } catch (error) {
       console.error('Error fetching products:', error);
+      // If products endpoint doesn't exist yet, just set empty array
+      setData(prev => ({ ...prev, products: [] }));
     }
   };
 
@@ -95,78 +302,42 @@ const FilterButtons = ({ activeFilter, onFilterChange }) => {
 
   const handleAddCategory = async (name) => {
     try {
-      const response = await fetch('/api/category', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
-      });
-
-      const result = await response.json();
+      const result = await apiService.createCategory(name);
       
-      if (response.ok) {
-        setData(prev => ({
-          ...prev,
-          categories: [result.category, ...prev.categories]
-        }));
-        alert('Category added successfully!');
-      } else {
-        alert(result.msg || 'Error adding category');
-      }
+      setData(prev => ({
+        ...prev,
+        categories: [result.category, ...prev.categories]
+      }));
+      alert('Category added successfully!');
     } catch (error) {
       console.error('Error adding category:', error);
-      alert('Error adding category');
+      alert('Error adding category: ' + error.message);
     }
   };
 
   const handleAddSubCategory = async (name, categoryId) => {
     try {
-      const response = await fetch('/api/subcategory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, categoryId }),
-      });
-
-      const result = await response.json();
+      await apiService.createSubCategory(name, categoryId);
       
-      if (response.ok) {
-        // Refresh sub-categories to get populated data
-        await fetchSubCategories();
-        alert('Sub-category added successfully!');
-      } else {
-        alert(result.msg || 'Error adding sub-category');
-      }
+      // Refresh sub-categories to get populated data
+      await fetchSubCategories();
+      alert('Sub-category added successfully!');
     } catch (error) {
       console.error('Error adding sub-category:', error);
-      alert('Error adding sub-category');
+      alert('Error adding sub-category: ' + error.message);
     }
   };
 
   const handleAddProduct = async (productData) => {
     try {
-      const response = await fetch('/api/product', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData),
-      });
-
-      const result = await response.json();
+      await apiService.createProduct(productData);
       
-      if (response.ok) {
-        // Refresh products to get populated data
-        await fetchProducts();
-        alert('Product added successfully!');
-      } else {
-        alert(result.msg || 'Error adding product');
-      }
+      // Refresh products to get populated data
+      await fetchProducts();
+      alert('Product added successfully!');
     } catch (error) {
       console.error('Error adding product:', error);
-      alert('Error adding product');
+      alert('Error adding product: ' + error.message);
     }
   };
 
