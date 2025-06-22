@@ -137,7 +137,7 @@ const Home = () => {
   };
 
   const handleProductClick = (product) => {
-    navigate(`/product-details/${product._id}`);
+    navigate(`/product/${product._id}`);
   };
 
   // UPDATED: Get display name to handle search results

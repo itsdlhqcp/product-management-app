@@ -20,16 +20,6 @@ const ProductCard = ({ product, onAddToCart, onProductClick }) => {
     return 0;
   };
 
-  // Get product availability
-  const getProductQuantity = () => {
-    if (product.variants && product.variants.length > 0) {
-      return product.variants.reduce((total, variant) => total + variant.quantity, 0);
-    }
-    return 0;
-  };
-
-  const isOutOfStock = getProductQuantity() === 0;
-
   return (
     <div className="product-card" onClick={() => onProductClick && onProductClick(product)}>
       <div className="product-image-container">
@@ -41,69 +31,15 @@ const ProductCard = ({ product, onAddToCart, onProductClick }) => {
             e.target.src = '/placeholder-image.jpg'; // Fallback for broken images
           }}
         />
-        <div className="product-badge">
-          <span className="heart-icon">♡</span>
-        </div>
-        {isOutOfStock && (
-          <div className="out-of-stock-overlay">
-            <span>Out of Stock</span>
-          </div>
-        )}
       </div>
       
       <div className="product-info">
-        <h3 className="product-name">{product.title}</h3>
-        <p className="product-description">{product.description}</p>
-        
-        {/* Category and Subcategory info */}
-        <div className="product-category">
-          <span className="category-name">
-            {product.subCategoryId?.categoryId?.name}
-          </span>
-          {product.subCategoryId?.name && (
-            <>
-              <span className="category-separator"> • </span>
-              <span className="subcategory-name">
-                {product.subCategoryId.name}
-              </span>
-            </>
-          )}
+        <div className="product-price" style={{ color: '#e74c3c', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '4px' }}>
+          ${getProductPrice()}
         </div>
-        
-        <div className="product-price-section">
-          <div className="product-price">${getProductPrice()}</div>
-          <div className="product-stock">
-            {getProductQuantity()} in stock
-          </div>
-        </div>
-        
-        {/* Product variants info */}
-        {product.variants && product.variants.length > 0 && (
-          <div className="product-variants">
-            {product.variants.map((variant, index) => (
-              <div key={variant._id || index} className="variant-info">
-                {variant.ram && <span className="variant-ram">RAM: {variant.ram}GB</span>}
-                {variant.storage && <span className="variant-storage">Storage: {variant.storage}GB</span>}
-                {variant.color && <span className="variant-color">Color: {variant.color}</span>}
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {onAddToCart && (
-          <button 
-            className={`add-to-cart-btn ${isOutOfStock ? 'disabled' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent card click when button is clicked
-              if (!isOutOfStock) {
-                onAddToCart(product);
-              }
-            }}
-            disabled={isOutOfStock}
-          >
-            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-          </button>
-        )}
+        <h3 className="product-name" style={{ fontSize: '1.5rem', fontWeight: '600', margin: '0', lineHeight: '1.2' }}>
+          {product.title}
+        </h3>
       </div>
     </div>
   );
