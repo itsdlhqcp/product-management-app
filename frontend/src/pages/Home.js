@@ -16,6 +16,11 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [cartCount, setCartCount] = useState(0);
 
+  // NEW: Search-related state variables
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+
   // State for dynamic data
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -51,8 +56,35 @@ const Home = () => {
     fetchData();
   }, []);
 
-  // Filter products based on selected category and subcategory
-  const filteredProducts = products.filter(product => {
+  // UPDATED: Search function with API integration
+  const handleSearch = async (searchTerm) => {
+    if (!searchTerm || searchTerm.trim() === '') {
+      // Clear search
+      setSearchTerm('');
+      setSearchResults([]);
+      setIsSearchActive(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setSearchTerm(searchTerm);
+      setIsSearchActive(true);
+      
+      const response = await apiService.searchProducts(searchTerm);
+      setSearchResults(response.products || []);
+      setCurrentPage(1); // Reset to first page
+    } catch (error) {
+      console.error('Search error:', error);
+      setError('Failed to search products. Please try again.');
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // UPDATED: Filter products to handle search results
+  const filteredProducts = isSearchActive ? searchResults : products.filter(product => {
     if (selectedCategory === 'all') return true;
     
     const productCategoryId = product.subCategoryId?.categoryId?._id;
@@ -71,10 +103,16 @@ const Home = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
+  // UPDATED: Handle category change and clear search
   const handleCategoryChange = (categoryId, subCategoryId = 'all') => {
     setSelectedCategory(categoryId);
     setSelectedSubCategory(subCategoryId);
     setCurrentPage(1);
+    
+    // Clear search when category changes
+    setSearchTerm('');
+    setSearchResults([]);
+    setIsSearchActive(false);
   };
 
   const handleFilterChange = (filter) => {
@@ -102,13 +140,12 @@ const Home = () => {
     navigate(`/product-details/${product._id}`);
   };
 
-  const handleSearch = (searchTerm) => {
-    console.log('Searching for:', searchTerm);
-    // You can implement search functionality here
-  };
-
-  // Get display name for current selection
+  // UPDATED: Get display name to handle search results
   const getDisplayName = () => {
+    if (isSearchActive) {
+      return `Search Results for "${searchTerm}"`;
+    }
+    
     if (selectedCategory === 'all') return 'All Products';
     
     if (selectedSubCategory !== 'all') {
@@ -195,7 +232,12 @@ const Home = () => {
             
             {filteredProducts.length === 0 ? (
               <div className="no-products">
-                <p>No products found for the selected category.</p>
+                <p>
+                  {isSearchActive 
+                    ? `No products found for "${searchTerm}"`
+                    : "No products found for the selected category."
+                  }
+                </p>
               </div>
             ) : (
               <>

@@ -1,19 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../assets/styles/components/Header.css';
 
-const Header = ({ onLogout, cartCount = 0 }) => {
+const Header = ({ onLogout, cartCount = 0, onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      onSearch(searchTerm.trim());
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Optional: Real-time search as user types (with debounce)
+    if (value.trim()) {
+      onSearch(value.trim());
+    } else {
+      // Clear search when input is empty
+      onSearch('');
+    }
+  };
+
   return (
     <header className="header">
       <div className="header-container">
         <div className="search-section">
-          <div className="search-bar">
+          <form className="search-bar" onSubmit={handleSearchSubmit}>
             <input 
               type="text" 
               placeholder="Search any things..." 
               className="search-input"
+              value={searchTerm}
+              onChange={handleSearchInputChange}
             />
-            <button className="search-btn">Search</button>
-          </div>
+            <button type="submit" className="search-btn">Search</button>
+          </form>
         </div>
         
         <div className="header-actions">

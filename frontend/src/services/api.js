@@ -111,6 +111,11 @@ class ApiService {
     });
   }
 
+  // Search products method
+  async searchProducts(query) {
+    return this.request(`/products/search/${encodeURIComponent(query)}`);
+  }
+
   // Helper method to get image URL
   getImageUrl(filename) {
     if (!filename) return null;
