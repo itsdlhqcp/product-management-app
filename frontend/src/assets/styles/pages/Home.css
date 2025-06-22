@@ -96,13 +96,206 @@
   max-height: 300px; 
   overflow-y: auto;
   padding-right: 8px;
-  margin-bottom: 20px; 
+  margin-bottom: 20px;
+
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
+
+.products-scrollable-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 
 .filter-buttons-wrapper {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 10px; 
+}
+
+/* Additional CSS for dynamic components - Add to your existing CSS files */
+
+/* Loading and Error States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  font-size: 18px;
+  color: #666;
+  padding: 20px;
+}
+
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.error-message {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.error-message h3 {
+  color: #dc3545;
+  margin-bottom: 10px;
+}
+
+.error-message p {
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.error-message button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-message button:hover {
+  background-color: #0056b3;
+}
+
+/* Sidebar enhancements */
+.loading-categories {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.category-name {
+  cursor: pointer;
+  flex: 1;
+}
+
+.category-parent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.category-parent:hover {
+  background-color: #f8f9fa;
+}
+
+.category-parent.active {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+/* ProductCard enhancements */
+.product-card {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.product-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.product-card:hover .product-overlay {
+  opacity: 1;
+}
+
+.add-to-cart-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #218838;
+}
+
+.product-details {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.product-category,
+.product-subcategory {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.product-subcategory {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.product-description {
+  font-size: 14px;
+  color: #666;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .category-parent {
+    padding: 12px;
+  }
+  
+  .subcategory-item {
+    padding: 10px 16px;
+  }
+  
+  .product-card {
+    margin-bottom: 16px;
+  }
+  
+  .product-details {
+    flex-direction: column;
+    gap: 4px;
+  }
 }
 
 @media (max-width: 768px) {

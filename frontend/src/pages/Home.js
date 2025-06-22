@@ -5,32 +5,76 @@ import Sidebar from "../components/Sidebar";
 import FilterButtons from "../components/FilterButton";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
-import productsData from '../data/product';
+import apiService from '../services/api.js';
 import "../assets/styles/pages/Home.css";
 
-function Home() {
+const Home = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('all');
   const [activeFilter, setActiveFilter] = useState('categories');
   const [currentPage, setCurrentPage] = useState(1);
   const [cartCount, setCartCount] = useState(0);
 
-  const [products] = useState(productsData);
+  // State for dynamic data
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const itemsPerPage = 6;
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+  // Fetch all data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [productsRes, categoriesRes, subCategoriesRes] = await Promise.all([
+          apiService.getProducts(),
+          apiService.getCategories(),
+          apiService.getSubCategories()
+        ]);
 
+        setProducts(productsRes.products || []);
+        setCategories(categoriesRes.categories || []);
+        setSubCategories(subCategoriesRes.subCategories || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter products based on selected category and subcategory
+  const filteredProducts = products.filter(product => {
+    if (selectedCategory === 'all') return true;
+    
+    const productCategoryId = product.subCategoryId?.categoryId?._id;
+    const productSubCategoryId = product.subCategoryId?._id;
+    
+    if (selectedSubCategory === 'all') {
+      // Filter by category only
+      return productCategoryId === selectedCategory;
+    } else {
+      // Filter by specific subcategory
+      return productSubCategoryId === selectedSubCategory;
+    }
+  });
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-    setCurrentPage(1); 
+  const handleCategoryChange = (categoryId, subCategoryId = 'all') => {
+    setSelectedCategory(categoryId);
+    setSelectedSubCategory(subCategoryId);
+    setCurrentPage(1);
   };
 
   const handleFilterChange = (filter) => {
@@ -45,22 +89,35 @@ function Home() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userData');
-    
     navigate('/signin');
   };
 
   const handleAddToCart = (product) => {
     setCartCount(prevCount => prevCount + 1);
     console.log('Added to cart:', product);
-    alert(`${product.name} added to cart!`);
+    alert(`${product.title} added to cart!`);
   };
 
   const handleProductClick = (product) => {
-    navigate(`/product-details/${product.id}`);
+    navigate(`/product-details/${product._id}`);
   };
 
   const handleSearch = (searchTerm) => {
     console.log('Searching for:', searchTerm);
+    // You can implement search functionality here
+  };
+
+  // Get display name for current selection
+  const getDisplayName = () => {
+    if (selectedCategory === 'all') return 'All Products';
+    
+    if (selectedSubCategory !== 'all') {
+      const subCategory = subCategories.find(sub => sub._id === selectedSubCategory);
+      return subCategory ? `${subCategory.name} Products` : 'Products';
+    }
+    
+    const category = categories.find(cat => cat._id === selectedCategory);
+    return category ? `${category.name} Products` : 'Products';
   };
 
   useEffect(() => {
@@ -72,7 +129,36 @@ function Home() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedSubCategory]);
+
+  if (loading) {
+    return (
+      <div className="home-container">
+        <Header 
+          onLogout={handleLogout} 
+          cartCount={cartCount}
+          onSearch={handleSearch}
+        />
+        <div className="loading">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="home-container">
+        <Header 
+          onLogout={handleLogout} 
+          cartCount={cartCount}
+          onSearch={handleSearch}
+        />
+        <div className="error">
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="home-container">
@@ -84,25 +170,24 @@ function Home() {
       
       <div className="main-content">
         <Sidebar 
+          categories={categories}
+          subCategories={subCategories}
           onCategoryChange={handleCategoryChange}
           selectedCategory={selectedCategory}
+          selectedSubCategory={selectedSubCategory}
         />
         
         <div className="content-area">
-        <div className="filter-buttons-wrapper">
+          <div className="filter-buttons-wrapper">
             <FilterButtons 
-                activeFilter={activeFilter}
-                onFilterChange={handleFilterChange}
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
             />
-            </div>
+          </div>
 
-          
           <div className="products-section">
             <div className="products-header">
-              <h2>
-                {selectedCategory === 'all' ? 'All Products' : 
-                 selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1) + ' Products'}
-              </h2>
+              <h2>{getDisplayName()}</h2>
               <span className="products-count">
                 {filteredProducts.length} products found
               </span>
@@ -114,21 +199,20 @@ function Home() {
               </div>
             ) : (
               <>
-              <div className="products-scrollable-container">
-                    <div className="products-grid">
-                        {currentProducts.map(product => (
-                        <div key={product.id} className="product-card-wrapper">
-                            <ProductCard 
-                            product={product}
-                            onAddToCart={() => handleAddToCart(product)}
-                            onProductClick={() => handleProductClick(product)}
-                            />
-                        </div>
-                        ))}
-                    </div>
-                    </div>
+                <div className="products-scrollable-container">
+                  <div className="products-grid">
+                    {currentProducts.map(product => (
+                      <div key={product._id} className="product-card-wrapper">
+                        <ProductCard 
+                          product={product}
+                          onAddToCart={() => handleAddToCart(product)}
+                          onProductClick={() => handleProductClick(product)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                
                 {totalPages > 1 && (
                   <div className="pagination-wrapper">
                     <Pagination
@@ -147,6 +231,6 @@ function Home() {
       </div>
     </div>
   );
-}
+};
 
 export default Home;

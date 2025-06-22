@@ -1,19 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../assets/styles/components/Sidebar.css';
 
-const Sidebar = ({ onCategoryChange, selectedCategory }) => {
+const Sidebar = ({ 
+  categories, 
+  subCategories, 
+  onCategoryChange, 
+  selectedCategory, 
+  selectedSubCategory 
+}) => {
   const [expandedSections, setExpandedSections] = useState({
-    categories: true,
-    laptop: false,
-    tablet: false,
-    headphones: false
+    categories: true
   });
+
+  // Initialize expanded sections for each category
+  useEffect(() => {
+    const initialExpanded = { categories: true };
+    categories.forEach(category => {
+      initialExpanded[category._id] = false;
+    });
+    setExpandedSections(initialExpanded);
+  }, [categories]);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  // Group subcategories by category
+  const getSubCategoriesForCategory = (categoryId) => {
+    return subCategories.filter(subCat => subCat.categoryId._id === categoryId);
   };
 
   return (
@@ -36,96 +53,69 @@ const Sidebar = ({ onCategoryChange, selectedCategory }) => {
         
         {expandedSections.categories && (
           <div className="category-list">
+            {/* All categories option */}
             <div 
               className={`category-item ${selectedCategory === 'all' ? 'active' : ''}`}
-              onClick={() => onCategoryChange('all')}
+              onClick={() => onCategoryChange('all', 'all')}
             >
               All categories
             </div>
             
-            <div className="category-group">
-              <div 
-                className="category-parent"
-                onClick={() => toggleSection('laptop')}
-              >
-                <span>Laptop</span>
-                <span className={`arrow ${expandedSections.laptop ? 'expanded' : ''}`}>
-                  ▼
-                </span>
-              </div>
-              {expandedSections.laptop && (
-                <div className="subcategory-list">
+            {/* Dynamic categories */}
+            {categories.map(category => {
+              const categorySubCategories = getSubCategoriesForCategory(category._id);
+              const hasSubCategories = categorySubCategories.length > 0;
+              
+              return (
+                <div key={category._id} className="category-group">
                   <div 
-                    className={`subcategory-item ${selectedCategory === 'gaming' ? 'active' : ''}`}
-                    onClick={() => onCategoryChange('gaming')}
+                    className={`category-parent ${!hasSubCategories ? 'category-item' : ''} ${
+                      selectedCategory === category._id && selectedSubCategory === 'all' ? 'active' : ''
+                    }`}
+                    onClick={() => {
+                      if (hasSubCategories) {
+                        toggleSection(category._id);
+                      } else {
+                        onCategoryChange(category._id, 'all');
+                      }
+                    }}
                   >
-                    Gaming
+                    <span 
+                      onClick={(e) => {
+                        if (hasSubCategories) {
+                          e.stopPropagation();
+                          onCategoryChange(category._id, 'all');
+                        }
+                      }}
+                      className={hasSubCategories ? 'clickable-category' : ''}
+                    >
+                      {category.name}
+                    </span>
+                    {hasSubCategories && (
+                      <span className={`arrow ${expandedSections[category._id] ? 'expanded' : ''}`}>
+                        ▼
+                      </span>
+                    )}
                   </div>
-                  <div 
-                    className={`subcategory-item ${selectedCategory === 'business' ? 'active' : ''}`}
-                    onClick={() => onCategoryChange('business')}
-                  >
-                    Business
-                  </div>
+                  
+                  {hasSubCategories && expandedSections[category._id] && (
+                    <div className="subcategory-list">
+                      {categorySubCategories.map(subCategory => (
+                        <div 
+                          key={subCategory._id}
+                          className={`subcategory-item ${
+                            selectedSubCategory === subCategory._id ? 'active' : ''
+                          }`}
+                          onClick={() => onCategoryChange(category._id, subCategory._id)}
+                        >
+                          {subCategory.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-
-            <div className="category-group">
-              <div 
-                className="category-parent"
-                onClick={() => toggleSection('tablet')}
-              >
-                <span>Tablet</span>
-                <span className={`arrow ${expandedSections.tablet ? 'expanded' : ''}`}>
-                  ▼
-                </span>
-              </div>
-              {expandedSections.tablet && (
-                <div className="subcategory-list">
-                  <div 
-                    className={`subcategory-item ${selectedCategory === 'ipad' ? 'active' : ''}`}
-                    onClick={() => onCategoryChange('ipad')}
-                  >
-                    iPad
-                  </div>
-                  <div 
-                    className={`subcategory-item ${selectedCategory === 'android' ? 'active' : ''}`}
-                    onClick={() => onCategoryChange('android')}
-                  >
-                    Android
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="category-group">
-              <div 
-                className="category-parent"
-                onClick={() => toggleSection('headphones')}
-              >
-                <span>Headphones</span>
-                <span className={`arrow ${expandedSections.headphones ? 'expanded' : ''}`}>
-                  ▼
-                </span>
-              </div>
-              {expandedSections.headphones && (
-                <div className="subcategory-list">
-                  <div 
-                    className={`subcategory-item ${selectedCategory === 'wireless' ? 'active' : ''}`}
-                    onClick={() => onCategoryChange('wireless')}
-                  >
-                    Wireless
-                  </div>
-                  <div 
-                    className={`subcategory-item ${selectedCategory === 'wired' ? 'active' : ''}`}
-                    onClick={() => onCategoryChange('wired')}
-                  >
-                    Wired
-                  </div>
-                </div>
-              )}
-            </div>
+              );
+            })}
           </div>
         )}
       </div>
