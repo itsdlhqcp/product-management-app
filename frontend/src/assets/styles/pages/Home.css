@@ -52,12 +52,10 @@
   font-weight: 500;
 }
 
-/* Remove flex: 1 and overflow properties to prevent extra space */
 .products-grid-container {
   margin-bottom: 20px;
 }
 
-/* Updated grid to show exactly 3 columns for 6 items (2 rows) */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -89,23 +87,22 @@
   margin: 0;
 }
 
-/* Pagination directly after products */
 .pagination-wrapper {
   border-top: 1px solid #e9ecef;
   padding-top: 20px;
 }
 
 .products-scrollable-container {
-  max-height: 300px; /* or whatever fits your layout */
+  max-height: 300px; 
   overflow-y: auto;
-  padding-right: 8px; /* Optional: for space near scrollbar */
-  margin-bottom: 20px; /* Space between product list and pagination */
+  padding-right: 8px;
+  margin-bottom: 20px; 
 }
 
 .filter-buttons-wrapper {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 10px; /* optional spacing below filters */
+  margin-bottom: 10px; 
 }
 
 @media (max-width: 768px) {
@@ -115,7 +112,6 @@
 }
 
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;
