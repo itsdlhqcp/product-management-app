@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import apiService from '../services/api.js';
+import AddProductModal from '../components/modals/AddProductModal';
 import "../assets/styles/pages/ProductDetails.css";
+
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -15,6 +17,44 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [cartCount, setCartCount] = useState(0);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [subCategories, setSubCategories] = useState([]);
+
+  // Add this function after your existing functions
+const fetchSubCategories = async () => {
+  try {
+    const result = await apiService.getSubCategories();
+    setSubCategories(result.subCategories);
+  } catch (error) {
+    console.error('Error fetching sub-categories:', error);
+  }
+};
+
+// Update your useEffect to also fetch subcategories
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/signin');
+    return;
+  }
+
+  const fetchProduct = async () => {
+    try {
+      const response = await apiService.getProductById(id);
+      setProduct(response.product);
+    } catch (err) {
+      console.error('Error fetching product:', err);
+      setError('Failed to load product details. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (id) {
+    fetchProduct();
+    fetchSubCategories(); // Add this line
+  }
+}, [id, navigate]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -60,6 +100,19 @@ const ProductDetails = () => {
     if (variant && quantity <= variant.quantity) {
       setCartCount(prev => prev + quantity);
       alert(`${quantity} x ${product.title} added to cart!`);
+    }
+  };
+
+  // Add this function after your existing handlers
+  const handleUpdateProduct = async (formData) => {
+    try {
+      const response = await apiService.updateProduct(id, formData);
+      setProduct(response.product);
+      setIsEditModalOpen(false);
+      alert('Product updated successfully!');
+    } catch (error) {
+      console.error('Error updating product:', error);
+      alert('Error updating product: ' + error.message);
     }
   };
 
@@ -207,12 +260,12 @@ const ProductDetails = () => {
           </div>
 
           <div className="action-buttons">
-            <button 
-              className="edit-product-btn"
-              onClick={() => navigate(`/edit-product/${id}`)}
-            >
-              Edit product
-            </button>
+          <button 
+            className="edit-product-btn"
+            onClick={() => setIsEditModalOpen(true)} // Change this line
+          >
+            Edit product
+          </button>
             <button 
               className="buy-now-btn"
               onClick={() => alert('Proceeding to checkout...')}
@@ -234,6 +287,14 @@ const ProductDetails = () => {
           </div> */}
         </div>
       </div>
+      <AddProductModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onAdd={handleUpdateProduct}
+        subCategories={subCategories}
+        editMode={true}
+        initialData={product}
+      />
     </div>
   );
 };

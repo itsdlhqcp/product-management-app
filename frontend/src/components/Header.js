@@ -15,11 +15,9 @@ const Header = ({ onLogout, cartCount = 0, onSearch }) => {
     const value = e.target.value;
     setSearchTerm(value);
     
-    // Optional: Real-time search as user types (with debounce)
     if (value.trim()) {
       onSearch(value.trim());
     } else {
-      // Clear search when input is empty
       onSearch('');
     }
   };
@@ -43,12 +41,12 @@ const Header = ({ onLogout, cartCount = 0, onSearch }) => {
         <div className="header-actions">
           <div className="user-section">
             <span className="user-icon">👤</span>
-            <span className="sign-in-text">Sign in</span>
+            <span className="sign-in-text">SignedIn</span>
           </div>
           
           <div className="cart-section">
-            <span className="cart-icon">🛒</span>
-            <span className="cart-text">Cart</span>
+            <span className="cart-icon">💖</span>
+            <span className="cart-text">Wishlist</span>
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </div>
           

@@ -20,13 +20,15 @@
 
 
 import express from 'express';
-import { createProduct, getProducts, getProduct, deleteProduct } from '../controllers/productController.js';
+import { createProduct, getProducts, getProduct, deleteProduct, updateProduct } from '../controllers/productController.js';
 import Product from '../models/Product.js'; 
 import upload from '../config/multer.js';
 
 const router = express.Router();
 
 router.post('/product', upload.array('images', 5), createProduct);
+
+router.put('/product/:id', upload.array('images', 5), updateProduct);
 
 router.get('/products', getProducts);
 

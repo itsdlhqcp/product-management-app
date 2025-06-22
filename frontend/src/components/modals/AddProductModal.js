@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../assets/styles/components/Modal.css';
+import apiService from '../../services/api';
 
-const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
+const AddProductModal = ({ isOpen, onClose, onAdd, subCategories, editMode = false, initialData = null}) => {
   const [productData, setProductData] = useState({
     title: '',
     description: '',
     subCategoryId: '',
     variants: [{ ram: '', price: '', quantity: '' }]
   });
+  const [existingImages, setExistingImages] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,6 +19,34 @@ const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
       ...prev,
       variants: [...prev.variants, { ram: '', price: '', quantity: '' }]
     }));
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      if (editMode && initialData) {
+        setProductData({
+          title: initialData.title || '',
+          description: initialData.description || '',
+          subCategoryId: initialData.subCategoryId?._id || initialData.subCategoryId || '',
+          variants: initialData.variants || [{ ram: '', price: '', quantity: '' }]
+        });
+        setExistingImages(initialData.images || []);
+      } else {
+        setProductData({
+          title: '',
+          description: '',
+          subCategoryId: '',
+          variants: [{ ram: '', price: '', quantity: '' }]
+        });
+        setExistingImages([]);
+      }
+      setSelectedFiles([]);
+      setFilePreviews([]);
+    }
+  }, [isOpen, editMode, initialData]);
+
+  const removeExistingImage = (index) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const removeVariant = (index) => {
@@ -111,17 +141,16 @@ const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
       }));
       formData.append('variants', JSON.stringify(processedVariants));
       
-      // Add image files
+      // Add existing images (for edit mode)
+      if (editMode && existingImages.length > 0) {
+        formData.append('existingImages', JSON.stringify(existingImages));
+      }
+      
+      // Add new image files
       selectedFiles.forEach((file) => {
         formData.append('images', file);
       });
-
-      // Debug: Log FormData contents
-      console.log('FormData contents:');
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-      
+  
       await onAdd(formData);
       
       // Reset form
@@ -131,6 +160,7 @@ const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
         subCategoryId: '',
         variants: [{ ram: '', price: '', quantity: '' }]
       });
+      setExistingImages([]);
       
       // Clean up file previews
       filePreviews.forEach(preview => URL.revokeObjectURL(preview.url));
@@ -139,8 +169,8 @@ const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
       
       onClose();
     } catch (error) {
-      console.error('Error adding product:', error);
-      alert('Error adding product: ' + error.message);
+      console.error('Error saving product:', error);
+      alert('Error saving product: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -159,7 +189,7 @@ const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content modal-large">
-        <h2>Add Product</h2>
+         <h2>{editMode ? 'Edit Product' : 'Add Product'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Title</label>
@@ -260,8 +290,39 @@ const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
               <small>Accepted formats: JPEG, JPG, PNG, GIF, WebP (Max 5MB each)</small>
             </div>
             
+            {/* Existing Images Display - Added here */}
+            {editMode && existingImages.length > 0 && (
+              <div className="existing-images">
+                <label>Current Images:</label>
+                <div className="image-previews">
+                  {existingImages.map((image, index) => (
+                    <div key={`existing-${index}`} className="image-preview">
+                      <img 
+                        src={apiService.getImageUrl(image)} 
+                        alt={`Existing ${index + 1}`}
+                        className="preview-image"
+                        onError={(e) => e.target.src = '/placeholder-image.jpg'}
+                      />
+                      <div className="preview-info">
+                        <span className="preview-name">{image}</span>
+                        <button
+                          type="button"
+                          className="btn-remove-image"
+                          onClick={() => removeExistingImage(index)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* New Image Previews */}
             {filePreviews.length > 0 && (
               <div className="image-previews">
+                <label>New Images:</label>
                 {filePreviews.map((preview, index) => (
                   <div key={index} className="image-preview">
                     <img 
@@ -299,7 +360,7 @@ const AddProductModal = ({ isOpen, onClose, onAdd, subCategories }) => {
               className="btn-add"
               disabled={loading || !productData.title.trim() || !productData.subCategoryId}
             >
-              {loading ? 'ADDING...' : 'ADD'}
+              {loading ? (editMode ? 'UPDATING...' : 'ADDING...') : (editMode ? 'UPDATE' : 'ADD')}
             </button>
           </div>
         </form>
