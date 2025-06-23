@@ -270,6 +270,17 @@ Dilhaque Ahemmed C P
 
 ## 📞 Support:- 8590788977
 
+### For Testing .env variables
+ENV variable for frontend
+`` 
+
+```
+
+ENV variable for backend
+`` 
+
+```
+
 For support, email dilhaquecp@gmail.com or create an issue in the repository.
 
 ---
