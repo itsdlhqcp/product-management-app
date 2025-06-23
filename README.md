@@ -260,17 +260,13 @@ Content-Type: multipart/form-data
 4. Push to the branch (`git push origin feature/new-feature`)
 5. Create a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 👨‍💻 Author
 
-[Your Name]
+Dilhaque Ahemmed C P
 
-## 📞 Support
+## 📞 Support:- 8590788977
 
-For support, email [your-email] or create an issue in the repository.
+For support, email dilhaquecp@gmail.com or create an issue in the repository.
 
 ---
 
