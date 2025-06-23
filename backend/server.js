@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import categoryRoutes from './routes/category.js';
 import productRoutes from './routes/product.js';
+import wishlistRoutes from './routes/wishlist.js'; // Add this line
 
 // Load environment variables
 dotenv.config();
@@ -41,7 +42,8 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: '/api/auth',
       categories: '/api',
-      products: '/api'
+      products: '/api',
+      wishlist: '/api' // Add this line
     }
   });
 });
@@ -50,6 +52,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', productRoutes);
+app.use('/api', wishlistRoutes); // Add this line
 
 // Error handling middleware for multer and other errors
 app.use((err, req, res, next) => {
@@ -95,6 +98,9 @@ mongoose.connect(process.env.MONGO_URI, {
     console.log(`  GET  /api/products - Get all products`);
     console.log(`  GET  /api/product/:id - Get single product`);
     console.log(`  DELETE /api/product/:id - Delete product`);
+    console.log(`  POST /api/wishlist - Add to wishlist`); // Add these lines
+    console.log(`  GET  /api/wishlist - Get user wishlist`);
+    console.log(`  DELETE /api/wishlist/:productId - Remove from wishlist`);
   });
 })
 .catch(err => {
