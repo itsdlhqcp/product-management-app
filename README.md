@@ -272,12 +272,15 @@ Dilhaque Ahemmed C P
 
 ### For Testing .env variables
 ENV variable for frontend
-`` 
-
+``` 
+REACT_APP_API_URL=http://localhost:5000/api
 ```
 
 ENV variable for backend
-`` 
+```
+PORT=5000
+MONGO_URI=mongodb+srv://productxxxxx:ukkdrAQDsaWPJbPX@cluster0.rsvl63s.mongodb.net/productdb?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=heloworldheloworldhelloworld
 
 ```
 
