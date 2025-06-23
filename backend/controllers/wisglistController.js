@@ -1,29 +1,13 @@
 import Wishlist from '../models/Wishlist.js';
 import Product from '../models/Product.js';
-import jwt from 'jsonwebtoken';
-
-// Helper function to get user ID from token
-const getUserFromToken = (req) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return null;
-  
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return decoded.userId;
-  } catch (error) {
-    return null;
-  }
-};
 
 // Add to wishlist
 export const addToWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
-    const userId = getUserFromToken(req);
+    const userId = req.userId; // From middleware
 
-    if (!userId) {
-      return res.status(401).json({ msg: 'Authentication required' });
-    }
+    console.log('Add to wishlist - User ID:', userId); // Debug log
 
     if (!productId) {
       return res.status(400).json({ msg: 'Product ID is required' });
@@ -63,11 +47,9 @@ export const addToWishlist = async (req, res) => {
 export const removeFromWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
-    const userId = getUserFromToken(req);
+    const userId = req.userId; // From middleware
 
-    if (!userId) {
-      return res.status(401).json({ msg: 'Authentication required' });
-    }
+    console.log('Remove from wishlist - User ID:', userId); // Debug log
 
     const wishlistItem = await Wishlist.findOneAndDelete({ userId, productId });
     
@@ -89,11 +71,9 @@ export const removeFromWishlist = async (req, res) => {
 // Get user's wishlist
 export const getUserWishlist = async (req, res) => {
   try {
-    const userId = getUserFromToken(req);
+    const userId = req.userId; // From middleware
 
-    if (!userId) {
-      return res.status(401).json({ msg: 'Authentication required' });
-    }
+    console.log('Get wishlist - User ID:', userId); // Debug log
 
     const wishlistItems = await Wishlist.find({ userId })
       .populate({
@@ -126,11 +106,9 @@ export const getUserWishlist = async (req, res) => {
 export const isInWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
-    const userId = getUserFromToken(req);
+    const userId = req.userId; // From middleware
 
-    if (!userId) {
-      return res.status(401).json({ msg: 'Authentication required' });
-    }
+    console.log('Check wishlist - User ID:', userId); // Debug log
 
     const wishlistItem = await Wishlist.findOne({ userId, productId });
     
@@ -150,11 +128,9 @@ export const isInWishlist = async (req, res) => {
 // Get wishlist count
 export const getWishlistCount = async (req, res) => {
   try {
-    const userId = getUserFromToken(req);
+    const userId = req.userId; // From middleware
 
-    if (!userId) {
-      return res.status(401).json({ msg: 'Authentication required' });
-    }
+    console.log('Get wishlist count - User ID:', userId); // Debug log
 
     const count = await Wishlist.countDocuments({ userId });
     

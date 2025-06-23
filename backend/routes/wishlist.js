@@ -6,14 +6,15 @@ import {
   isInWishlist,
   getWishlistCount 
 } from '../controllers/wisglistController.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Wishlist routes
-router.post('/wishlist', addToWishlist);
-router.delete('/wishlist/:productId', removeFromWishlist);
-router.get('/wishlist', getUserWishlist);
-router.get('/wishlist/check/:productId', isInWishlist);
-router.get('/wishlist/count', getWishlistCount);
+// Wishlist routes - all protected with authentication middleware
+router.post('/wishlist', authenticateToken, addToWishlist);
+router.delete('/wishlist/:productId', authenticateToken, removeFromWishlist);
+router.get('/wishlist', authenticateToken, getUserWishlist);
+router.get('/wishlist/check/:productId', authenticateToken, isInWishlist);
+router.get('/wishlist/count', authenticateToken, getWishlistCount);
 
 export default router;

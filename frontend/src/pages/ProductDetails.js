@@ -5,7 +5,6 @@ import apiService from '../services/api.js';
 import AddProductModal from '../components/modals/AddProductModal';
 import "../assets/styles/pages/ProductDetails.css";
 
-
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -19,42 +18,70 @@ const ProductDetails = () => {
   const [cartCount, setCartCount] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [subCategories, setSubCategories] = useState([]);
+  
+  // NEW: Wishlist state
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
-  // Add this function after your existing functions
-const fetchSubCategories = async () => {
-  try {
-    const result = await apiService.getSubCategories();
-    setSubCategories(result.subCategories);
-  } catch (error) {
-    console.error('Error fetching sub-categories:', error);
-  }
-};
-
-// Update your useEffect to also fetch subcategories
-useEffect(() => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    navigate('/signin');
-    return;
-  }
-
-  const fetchProduct = async () => {
+  // Fetch wishlist count
+  const fetchWishlistCount = async () => {
     try {
-      const response = await apiService.getProductById(id);
-      setProduct(response.product);
-    } catch (err) {
-      console.error('Error fetching product:', err);
-      setError('Failed to load product details. Please try again.');
-    } finally {
-      setLoading(false);
+      const response = await apiService.getWishlistCount();
+      setWishlistCount(response.count);
+    } catch (error) {
+      console.error('Error fetching wishlist count:', error);
     }
   };
 
-  if (id) {
-    fetchProduct();
-    fetchSubCategories(); // Add this line
-  }
-}, [id, navigate]);
+  // Check if product is in wishlist
+  const checkWishlistStatus = async () => {
+    try {
+      const response = await apiService.isInWishlist(id);
+      setIsInWishlist(response.isInWishlist);
+    } catch (error) {
+      console.error('Error checking wishlist status:', error);
+    }
+  };
+
+  // Handle wishlist toggle
+  const handleWishlistToggle = async () => {
+    try {
+      setWishlistLoading(true);
+      
+      if (isInWishlist) {
+        await apiService.removeFromWishlist(id);
+        setIsInWishlist(false);
+        setWishlistCount(prev => Math.max(0, prev - 1));
+        alert('Product removed from wishlist!');
+      } else {
+        await apiService.addToWishlist(id);
+        setIsInWishlist(true);
+        setWishlistCount(prev => prev + 1);
+        alert('Product added to wishlist!');
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      alert('Error updating wishlist: ' + error.message);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
+  // Handle wishlist navigation
+  const handleWishlistClick = () => {
+    navigate('/wishlist');
+  };
+
+  // Fetch subcategories
+  const fetchSubCategories = async () => {
+    try {
+      const result = await apiService.getSubCategories();
+      setSubCategories(result.subCategories);
+    } catch (error) {
+      console.error('Error fetching sub-categories:', error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -67,6 +94,13 @@ useEffect(() => {
       try {
         const response = await apiService.getProductById(id);
         setProduct(response.product);
+        
+        // Fetch additional data
+        await Promise.all([
+          fetchSubCategories(),
+          fetchWishlistCount(),
+          checkWishlistStatus()
+        ]);
       } catch (err) {
         console.error('Error fetching product:', err);
         setError('Failed to load product details. Please try again.');
@@ -75,7 +109,9 @@ useEffect(() => {
       }
     };
 
-    if (id) fetchProduct();
+    if (id) {
+      fetchProduct();
+    }
   }, [id, navigate]);
 
   const handleLogout = () => {
@@ -103,7 +139,6 @@ useEffect(() => {
     }
   };
 
-  // Add this function after your existing handlers
   const handleUpdateProduct = async (formData) => {
     try {
       const response = await apiService.updateProduct(id, formData);
@@ -128,7 +163,13 @@ useEffect(() => {
   if (loading) {
     return (
       <div className="product-details-container">
-        <Header onLogout={handleLogout} cartCount={cartCount} onSearch={handleSearch} />
+        <Header 
+          onLogout={handleLogout} 
+          cartCount={cartCount} 
+          wishlistCount={wishlistCount}
+          onSearch={handleSearch}
+          onWishlistClick={handleWishlistClick}
+        />
         <div className="loading">Loading product details...</div>
       </div>
     );
@@ -137,7 +178,13 @@ useEffect(() => {
   if (error || !product) {
     return (
       <div className="product-details-container">
-        <Header onLogout={handleLogout} cartCount={cartCount} onSearch={handleSearch} />
+        <Header 
+          onLogout={handleLogout} 
+          cartCount={cartCount} 
+          wishlistCount={wishlistCount}
+          onSearch={handleSearch}
+          onWishlistClick={handleWishlistClick}
+        />
         <div className="error">
           <p>{error || 'Product not found'}</p>
           <button onClick={() => navigate('/')}>Back to Home</button>
@@ -151,7 +198,13 @@ useEffect(() => {
 
   return (
     <div className="product-details-container">
-      <Header onLogout={handleLogout} cartCount={cartCount} onSearch={handleSearch} />
+      <Header 
+        onLogout={handleLogout} 
+        cartCount={cartCount} 
+        wishlistCount={wishlistCount}
+        onSearch={handleSearch}
+        onWishlistClick={handleWishlistClick}
+      />
       
       <div className="breadcrumb">
         <span onClick={navigateHome} className="breadcrumb-link">Home</span>
@@ -260,12 +313,12 @@ useEffect(() => {
           </div>
 
           <div className="action-buttons">
-          <button 
-            className="edit-product-btn"
-            onClick={() => setIsEditModalOpen(true)} // Change this line
-          >
-            Edit product
-          </button>
+            <button 
+              className="edit-product-btn"
+              onClick={() => setIsEditModalOpen(true)}
+            >
+              Edit product
+            </button>
             <button 
               className="buy-now-btn"
               onClick={() => alert('Proceeding to checkout...')}
@@ -274,19 +327,16 @@ useEffect(() => {
               Buy it now
             </button>
             <button 
-              className="wishlist-btn"
-              onClick={() => alert('Added to wishlist!')}
+              className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
+              onClick={handleWishlistToggle}
+              disabled={wishlistLoading}
             >
-              ♡
+              {wishlistLoading ? '...' : (isInWishlist ? '❤️' : '♡')}
             </button>
           </div>
-
-          {/* <div className="category-info">
-            <p><strong>Category:</strong> {product.subCategoryId?.categoryId?.name}</p>
-            <p><strong>Sub Category:</strong> {product.subCategoryId?.name}</p>
-          </div> */}
         </div>
       </div>
+      
       <AddProductModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

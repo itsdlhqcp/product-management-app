@@ -15,8 +15,11 @@ const Home = () => {
   const [activeFilter, setActiveFilter] = useState('categories');
   const [currentPage, setCurrentPage] = useState(1);
   const [cartCount, setCartCount] = useState(0);
+  
+  // NEW: Wishlist state
+  const [wishlistCount, setWishlistCount] = useState(0);
 
-  // NEW: Search-related state variables
+  // Search-related state variables
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -29,6 +32,16 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   const itemsPerPage = 6;
+
+  // Fetch wishlist count
+  const fetchWishlistCount = async () => {
+    try {
+      const response = await apiService.getWishlistCount();
+      setWishlistCount(response.count);
+    } catch (error) {
+      console.error('Error fetching wishlist count:', error);
+    }
+  };
 
   // Fetch all data on component mount
   useEffect(() => {
@@ -45,6 +58,9 @@ const Home = () => {
         setCategories(categoriesRes.categories || []);
         setSubCategories(subCategoriesRes.subCategories || []);
         setError(null);
+        
+        // Fetch wishlist count
+        await fetchWishlistCount();
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Failed to load data. Please try again.');
@@ -56,7 +72,7 @@ const Home = () => {
     fetchData();
   }, []);
 
-  // UPDATED: Search function with API integration
+  // Search function with API integration
   const handleSearch = async (searchTerm) => {
     if (!searchTerm || searchTerm.trim() === '') {
       // Clear search
@@ -83,7 +99,7 @@ const Home = () => {
     }
   };
 
-  // UPDATED: Filter products to handle search results
+  // Filter products to handle search results
   const filteredProducts = isSearchActive ? searchResults : products.filter(product => {
     if (selectedCategory === 'all') return true;
     
@@ -103,7 +119,7 @@ const Home = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
-  // UPDATED: Handle category change and clear search
+  // Handle category change and clear search
   const handleCategoryChange = (categoryId, subCategoryId = 'all') => {
     setSelectedCategory(categoryId);
     setSelectedSubCategory(subCategoryId);
@@ -124,6 +140,8 @@ const Home = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Updated logout handler - now just clears data without confirmation
+  // (confirmation is handled in Header component)
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userData');
@@ -140,7 +158,12 @@ const Home = () => {
     navigate(`/product/${product._id}`);
   };
 
-  // UPDATED: Get display name to handle search results
+  // NEW: Handle wishlist navigation
+  const handleWishlistClick = () => {
+    navigate('/wishlist');
+  };
+
+  // Get display name to handle search results
   const getDisplayName = () => {
     if (isSearchActive) {
       return `Search Results for "${searchTerm}"`;
@@ -174,7 +197,9 @@ const Home = () => {
         <Header 
           onLogout={handleLogout} 
           cartCount={cartCount}
+          wishlistCount={wishlistCount}
           onSearch={handleSearch}
+          onWishlistClick={handleWishlistClick}
         />
         <div className="loading">Loading...</div>
       </div>
@@ -187,7 +212,9 @@ const Home = () => {
         <Header 
           onLogout={handleLogout} 
           cartCount={cartCount}
+          wishlistCount={wishlistCount}
           onSearch={handleSearch}
+          onWishlistClick={handleWishlistClick}
         />
         <div className="error">
           <p>{error}</p>
@@ -202,7 +229,9 @@ const Home = () => {
       <Header 
         onLogout={handleLogout} 
         cartCount={cartCount}
+        wishlistCount={wishlistCount}
         onSearch={handleSearch}
+        onWishlistClick={handleWishlistClick}
       />
       
       <div className="main-content">
