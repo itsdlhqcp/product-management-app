@@ -1,7 +1,7 @@
 # Product Management Application
+![Screenshot 2025-06-23 134633](https://github.com/user-attachments/assets/15a8548e-a960-45d5-b889-cc025442b781)
 
-![Screenshot 2025-06-23 114314](https://github.com/user-attachments/assets/9f050040-52f7-475b-9c71-6c4cdf609a1a)
-![Screenshot 2025-06-23 114904](https://github.com/user-attachments/assets/a50c4e5a-4db7-48ca-a89e-e0dbed395740)
+![Screenshot 2025-06-23 134559](https://github.com/user-attachments/assets/361150a1-6609-4ac7-b362-162be5b99de5)
 
 A full-stack product management application built with the MERN stack (MongoDB, Express.js, React.js, Node.js) that allows users to manage categories, subcategories, and products with multiple variants.
 
