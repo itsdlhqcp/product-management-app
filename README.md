@@ -1,10 +1,18 @@
-
 # Product Management Application
 
 ![Screenshot 2025-06-23 114314](https://github.com/user-attachments/assets/9f050040-52f7-475b-9c71-6c4cdf609a1a)
 ![Screenshot 2025-06-23 114904](https://github.com/user-attachments/assets/a50c4e5a-4db7-48ca-a89e-e0dbed395740)
 
 A full-stack product management application built with the MERN stack (MongoDB, Express.js, React.js, Node.js) that allows users to manage categories, subcategories, and products with multiple variants.
+
+## 🌐 Live Demo
+
+### 🔗 Deployed Links
+- **Frontend**: [https://lapmart.vercel.app/home](https://lapmart.vercel.app/home)
+- **Backend API**: [https://prod-manage-api.onrender.com](https://prod-manage-api.onrender.com)
+- **API Products Endpoint**: [https://prod-manage-api.onrender.com/api/products](https://prod-manage-api.onrender.com/api/products)
+
+> **Note**: Backend is deployed on Render's free tier, which may take up to 4 minutes to spin up from cold start. Please be patient on first load.
 
 ## 🚀 Features
 
@@ -32,6 +40,11 @@ A full-stack product management application built with the MERN stack (MongoDB, 
 - **React.js** - JavaScript library for building user interfaces
 - **HTML5 & CSS3** - Markup and styling
 - **JavaScript (ES6+)** - Programming language
+
+### Deployment
+- **Frontend**: Vercel
+- **Backend**: Render (Free Tier)
+- **Database**: MongoDB Atlas
 
 ## 📁 Project Structure
 
@@ -104,7 +117,12 @@ Application will run on `http://localhost:3000`
 
 ## 📚 API Documentation
 
-### Base URL
+### Base URL (Production)
+```
+https://prod-manage-api.onrender.com/api
+```
+
+### Base URL (Local Development)
 ```
 http://localhost:5000/api
 ```
@@ -186,11 +204,13 @@ Content-Type: multipart/form-data
 - ✅ Product Management with Variants
 - ✅ Image Upload
 - ✅ Database Integration
+- ✅ **Deployed on Render**
 
 ### Frontend
 - ✅ **Large Screens** - Fully responsive and functional
 - ✅ **Medium Screens** - Fully responsive and functional
 - ⚠️ **Small Screens** - 20% responsive work completed
+- ✅ **Deployed on Vercel**
 
 ## 🔍 Sample API Responses
 
@@ -245,6 +265,7 @@ Content-Type: multipart/form-data
 - **Image Handling** - File upload and storage
 - **Relational Data** - Proper linking between categories, subcategories, and products
 - **Product Variants** - Multiple variants per product with different specifications
+- **Cloud Deployment** - Production-ready deployment on modern platforms
 
 ## 🚧 Future Enhancements
 
@@ -268,24 +289,34 @@ Content-Type: multipart/form-data
 
 Dilhaque Ahemmed C P
 
-## 📞 Support:- 8590788977
+## 📞 Support: 8590788977
 
-### For Testing .env variables
-ENV variable for frontend
+### Environment Variables
+
+#### For Testing - Frontend (.env)
 ``` 
+# Local Development
 REACT_APP_API_URL=http://localhost:5000/api
+
+# Production
+REACT_APP_API_URL=https://prod-manage-api.onrender.com/api
 ```
 
-ENV variable for backend
+#### For Testing - Backend (.env)
 ```
 PORT=5000
 MONGO_URI=mongodb+srv://productxxxxx:ukkdrAQDsaWPJbPX@cluster0.rsvl63s.mongodb.net/productdb?retryWrites=true&w=majority&appName=Cluster0
 JWT_SECRET=heloworldheloworldhelloworld
-
 ```
+
+## 🔗 Quick Test Links
+
+- **Live Application**: [https://lapmart.vercel.app/home](https://lapmart.vercel.app/home)
+- **API Health Check**: [https://prod-manage-api.onrender.com](https://prod-manage-api.onrender.com)
+- **All Products API**: [https://prod-manage-api.onrender.com/api/products](https://prod-manage-api.onrender.com/api/products)
 
 For support, email dilhaquecp@gmail.com or create an issue in the repository.
 
 ---
 
-**Note**: This application was developed as part of a 2-day assignment to demonstrate full-stack development skills using the MERN stack.
+**Note**: This application was developed as part of a 2-day assignment to demonstrate full-stack development skills using the MERN stack. The application is now live and accessible via the provided deployment links.
